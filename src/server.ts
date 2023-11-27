@@ -83,7 +83,7 @@ app.put("/animes/:id", async (request, reply) => {
 });
 
 app.delete("/animes/:id", async (request, reply) => {
-  const id = request.params;
+  const { id } = request.params as { id: number };
   await prisma.anime.delete({
     where: {
       id: Number(id),
