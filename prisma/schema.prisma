@@ -12,23 +12,26 @@ datasource db {
 
 
 model Character {
-  id       Int      @id @default(autoincrement())
-  name     String
-  age      Int
+  id            Int      @id @default(autoincrement())
+  name          String
   characteristics String
-  prefix   String
-  imageURL String
-  animeId  Int
+  age           Int
+  anime         Anime    @relation(fields: [animeId], references: [id])
+  animeId       Int
+  prefix        String?
+  imageUrl      String?
+
+  @@index([animeId], name: "idx_animeId")
 }
 
 model Anime {
-
-  id          Int          @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
-  description String
-  release   String
-  director   String
+  release     Int
+  director    String
   episodes    Int
   publication String
+  description String
 
+  characters  Character[]
 }

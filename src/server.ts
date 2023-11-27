@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import fastify from "fastify";
+import fastifyCors from "@fastify/cors";
 import z from "zod";
 
 const app = fastify();
+
+app.register(fastifyCors);
 
 const prisma = new PrismaClient();
 
@@ -29,7 +32,7 @@ app.post("/animes", async (request, reply) => {
     id: z.number().optional(),
     name: z.string(),
     description: z.string(),
-    release: z.string(),
+    release: z.number(),
     director: z.string(),
     episodes: z.number(),
     publication: z.string(),
@@ -38,7 +41,7 @@ app.post("/animes", async (request, reply) => {
   const { id, name, description, release, director, episodes, publication } =
     createAnimeSchema.parse(request.body);
 
-  await prisma.anime.create({
+  const createdAnime = await prisma.anime.create({
     data: {
       id,
       name,
@@ -49,7 +52,8 @@ app.post("/animes", async (request, reply) => {
       publication,
     },
   });
-  return reply.status(201).send();
+
+  return reply.status(201).send({ id: createdAnime.id });
 });
 
 app.put("/animes/:id", async (request, reply) => {
@@ -57,7 +61,7 @@ app.put("/animes/:id", async (request, reply) => {
   const updateAnimeSchema = z.object({
     name: z.string(),
     description: z.string(),
-    release: z.string(),
+    release: z.number(),
     director: z.string(),
     episodes: z.number(),
     publication: z.string(),
@@ -102,12 +106,12 @@ app.post("/characters", async (request, reply) => {
     name: z.string(),
     characteristics: z.string(),
     prefix: z.string(),
-    imageURL: z.string(),
+    imageUrl: z.string(),
     age: z.number(),
     animeId: z.number(),
   });
 
-  const { id, name, characteristics, prefix, imageURL, age, animeId } =
+  const { id, name, characteristics, prefix, imageUrl, age, animeId } =
     createCharacterSchema.parse(request.body);
 
   await prisma.character.create({
@@ -116,7 +120,7 @@ app.post("/characters", async (request, reply) => {
       name,
       characteristics,
       prefix,
-      imageURL,
+      imageUrl,
       age,
       animeId,
     },
@@ -130,12 +134,12 @@ app.put("/characters/:id", async (request, reply) => {
     name: z.string(),
     characteristics: z.string(),
     prefix: z.string(),
-    imageURL: z.string(),
+    imageUrl: z.string(),
     age: z.number(),
     animeId: z.number(),
   });
 
-  const { name, characteristics, prefix, imageURL, age, animeId } =
+  const { name, characteristics, prefix, imageUrl, age, animeId } =
     updateCharacterSchema.parse(request.body);
 
   await prisma.character.update({
@@ -146,7 +150,7 @@ app.put("/characters/:id", async (request, reply) => {
       name,
       characteristics,
       prefix,
-      imageURL,
+      imageUrl,
       age,
       animeId,
     },
