@@ -52,6 +52,45 @@ app.post("/animes", async (request, reply) => {
   return reply.status(201).send();
 });
 
+app.put("/animes/:id", async (request, reply) => {
+  const id = request.params;
+  const updateAnimeSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    release: z.string(),
+    director: z.string(),
+    episodes: z.number(),
+    publication: z.string(),
+  });
+
+  const { name, description, release, director, episodes, publication } =
+    updateAnimeSchema.parse(request.body);
+
+  await prisma.anime.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      name,
+      description,
+      release,
+      director,
+      episodes,
+      publication,
+    },
+  });
+  return reply.status(204).send();
+});
+
+app.delete("/animes/:id", async (request, reply) => {
+  const id = request.params;
+  await prisma.anime.delete({
+    where: {
+      id: Number(id),
+    },
+  });
+  return reply.status(204).send();
+});
 app.get("/characters", async () => {
   const characters = await prisma.character.findMany();
   return characters;
