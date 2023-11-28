@@ -138,7 +138,6 @@ app.put("/characters/:id", async (request, reply) => {
     age: z.number(),
     animeId: z.number(),
   });
-
   const { name, characteristics, prefix, imageUrl, age, animeId } =
     updateCharacterSchema.parse(request.body);
 
@@ -155,7 +154,17 @@ app.put("/characters/:id", async (request, reply) => {
       animeId,
     },
   });
-  return reply.status(204).send();
+  return reply.status(204).send("Character updated successfully");
+});
+
+app.delete("/characters/:id", async (request, reply) => {
+  const { id } = request.params as { id: number };
+  await prisma.character.delete({
+    where: {
+      id: Number(id),
+    },
+  });
+  return reply.status(204).send("Character deleted successfully");
 });
 
 // Define the endpoint for characters with anime
