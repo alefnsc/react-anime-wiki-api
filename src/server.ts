@@ -158,6 +158,24 @@ app.put("/characters/:id", async (request, reply) => {
   return reply.status(204).send();
 });
 
+// Define the endpoint for characters with anime
+app.get("/charactersWithAnime", async (request, reply) => {
+  try {
+    // Fetch characters with their associated anime using Prisma
+    const charactersWithAnime = await prisma.character.findMany({
+      include: {
+        anime: true,
+      },
+    });
+
+    // Return the result as JSON
+    reply.send(charactersWithAnime);
+  } catch (error) {
+    // Handle any errors
+    reply.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
 app
   .listen({
     host: "0.0.0.0",
