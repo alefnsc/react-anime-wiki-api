@@ -102,7 +102,7 @@ app.get("/characters", async () => {
 });
 
 app.get("/characters/:id", async (request, reply) => {
-  const id = request.params;
+  const { id } = request.params as { id: number };
   const character = await prisma.character.findUnique({
     where: {
       id: Number(id),
@@ -143,32 +143,37 @@ app.post("/characters", async (request, reply) => {
 });
 
 app.put("/characters/:id", async (request, reply) => {
-  const id = request.params;
-  const updateCharacterSchema = z.object({
-    name: z.string(),
-    characteristics: z.string(),
-    prefix: z.string(),
-    imageUrl: z.string(),
-    age: z.number(),
-    animeId: z.number(),
-  });
-  const { name, characteristics, prefix, imageUrl, age, animeId } =
-    updateCharacterSchema.parse(request.body);
+  try {
+    const { id } = request.params as { id: number };
 
-  await prisma.character.update({
-    where: {
-      id: Number(id),
-    },
-    data: {
-      name,
-      characteristics,
-      prefix,
-      imageUrl,
-      age,
-      animeId,
-    },
-  });
-  return reply.status(204).send("Character updated successfully");
+    const updateCharacterSchema = z.object({
+      name: z.string(),
+      characteristics: z.string(),
+      prefix: z.string(),
+      imageUrl: z.string(),
+      age: z.number(),
+      animeId: z.number(),
+    });
+    const { name, characteristics, prefix, imageUrl, age, animeId } =
+      updateCharacterSchema.parse(request.body);
+
+    await prisma.character.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        name,
+        characteristics,
+        prefix,
+        imageUrl,
+        age,
+        animeId,
+      },
+    });
+    return reply.status(204).send("Character updated successfully");
+  } catch (error) {
+    return error;
+  }
 });
 
 app.delete("/characters/:id", async (request, reply) => {
