@@ -95,9 +95,23 @@ app.delete("/animes/:id", async (request, reply) => {
   });
   return reply.status(204).send();
 });
+
 app.get("/characters", async () => {
   const characters = await prisma.character.findMany();
   return characters;
+});
+
+app.get("/characters/:id", async (request, reply) => {
+  const id = request.params;
+  const character = await prisma.character.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+  if (!character) {
+    return reply.status(404).send("Character not found");
+  }
+  return character;
 });
 
 app.post("/characters", async (request, reply) => {
